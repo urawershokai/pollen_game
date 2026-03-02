@@ -16,7 +16,8 @@ const actionBtn = document.getElementById('action-button');
 
 // ゲーム設定
 const SETTINGS = {
-    heroRadius: 18,
+    heroSize: 48, // 表示サイズ（ピクセル）
+    playerRadiusScale: 0.45, // min(w, h) * 0.45
     pollenRadius: 4, // P0: 大幅に小型化
     treeRadius: 40,
     speed: {
@@ -32,6 +33,10 @@ const SETTINGS = {
         { pollenCount: 35, pollenSpeed: 3.5 }
     ]
 };
+
+// 画像の読み込み
+const heroImg = new Image();
+heroImg.src = 'ax.png';
 
 // ゲーム状態
 let state = {
@@ -54,6 +59,11 @@ let state = {
         lastDir: null
     }
 };
+
+// プレイヤーの現在の当たり判定半径を取得
+function getHeroRadius() {
+    return SETTINGS.heroSize * SETTINGS.playerRadiusScale;
+}
 
 // キャンバスのリサイズ
 function resize() {
@@ -259,6 +269,7 @@ function gameLoop() {
 function update() {
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
+    const heroRadius = getHeroRadius();
 
     // 無敵タイマー
     if (state.isInvincible && Date.now() - state.invincibleTimer > SETTINGS.invincibleDuration) {
@@ -272,9 +283,9 @@ function update() {
     if (state.input.left) state.hero.x -= SETTINGS.speed.hero;
     if (state.input.right) state.hero.x += SETTINGS.speed.hero;
 
-    // 画面外ブロック
-    state.hero.x = Math.max(SETTINGS.heroRadius, Math.min(width - SETTINGS.heroRadius, state.hero.x));
-    state.hero.y = Math.max(SETTINGS.heroRadius, Math.min(height - SETTINGS.heroRadius, state.hero.y));
+    // 画面外ブロック（見た目の端ではなく、中心座標の制限として heroRadius を使用）
+    state.hero.x = Math.max(heroRadius, Math.min(width - heroRadius, state.hero.x));
+    state.hero.y = Math.max(heroRadius, Math.min(height - heroRadius, state.hero.y));
 
     // 花粉移動と反射
     state.pollens.forEach(p => {
@@ -290,10 +301,10 @@ function update() {
             p.y = p.y < SETTINGS.pollenRadius ? SETTINGS.pollenRadius : height - SETTINGS.pollenRadius;
         }
 
-        // 衝突判定: 主人公 vs 花粉
+        // 衝突判定: 主人公 vs 花粉 (円形当たり判定)
         if (!state.isInvincible) {
             const dist = Math.hypot(p.x - state.hero.x, p.y - state.hero.y);
-            if (dist < SETTINGS.pollenRadius + SETTINGS.heroRadius) {
+            if (dist < SETTINGS.pollenRadius + heroRadius) {
                 hitPollen();
             }
         }
@@ -301,7 +312,7 @@ function update() {
 
     // 衝突判定: 主人公 vs 花粉樹
     const distToTree = Math.hypot(state.tree.x - state.hero.x, state.tree.y - state.hero.y);
-    if (distToTree < SETTINGS.treeRadius + SETTINGS.heroRadius) {
+    if (distToTree < SETTINGS.treeRadius + heroRadius) {
         clearStage();
     }
 }
@@ -392,17 +403,25 @@ function draw() {
         ctx.stroke();
     });
 
-    // 主人公
-    ctx.beginPath();
-    ctx.arc(state.hero.x, state.hero.y, SETTINGS.heroRadius, 0, Math.PI * 2);
-    ctx.fillStyle = state.isInvincible ? '#fff' : varToHex('--hero-color');
-    ctx.fill();
-    ctx.shadowBlur = state.isInvincible ? 20 : 0;
-    ctx.shadowColor = '#fff';
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    // 主人公 (斧画像)
+    if (heroImg.complete) {
+        const size = SETTINGS.heroSize;
+        ctx.save();
+        if (state.isInvincible) {
+            ctx.globalAlpha = 0.6;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#fff';
+        }
+        // 画像は中心座標 (state.hero.x, state.hero.y) を中心に描画
+        ctx.drawImage(heroImg, state.hero.x - size / 2, state.hero.y - size / 2, size, size);
+        ctx.restore();
+    } else {
+        // 画像読み込み前、またはエラー時の代替表示
+        ctx.beginPath();
+        ctx.arc(state.hero.x, state.hero.y, getHeroRadius(), 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+    }
 }
 
 function varToHex(varName) {

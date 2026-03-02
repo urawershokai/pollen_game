@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>花粉駆逐</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4444">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- 情報バー -->
+        <div id="info-bar">
+            <div>
+                <div class="status-item">STAGE: <span id="stage-num">1</span></div>
+                <div id="gauge-container">
+                    <div class="gauge-unit"></div>
+                </div>
+            </div>
+            <div class="status-item" id="invincible-indicator"
+                style="color: #4488ff; border-color: #4488ff; opacity: 0;">NO DAMAGE</div>
+        </div>
+
+        <!-- ゲームキャンバス -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- コントローラー -->
+        <div id="controls">
+            <div class="controls-inner">
+                <div class="d-pad">
+                    <div class="control-btn btn-up" id="btn-up" data-dir="up">↑</div>
+                    <div class="control-btn btn-left" id="btn-left" data-dir="left">←</div>
+                    <button id="pause-btn">⏸</button>
+                    <div class="control-btn btn-right" id="btn-right" data-dir="right">→</div>
+                    <div class="control-btn btn-down" id="btn-down" data-dir="down">↓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- オーバーレイ: 一時停止 -->
+        <div id="overlay-pause" class="overlay hidden">
+            <h1>PAUSED</h1>
+            <p class="quote">「戦場での休息は死を意味する。」</p>
+        </div>
+
+        <!-- オーバーレイ: タイトル -->
+        <div id="overlay-start" class="overlay">
+            <h1>花粉駆逐</h1>
+            <p class="quote">「駆逐してやる、一粒残らず。」</p>
+            <button id="start-button">作戦開始</button>
+        </div>
+
+        <!-- オーバーレイ: メッセージ (クリア / ゲームオーバー) -->
+        <div id="overlay-message" class="overlay hidden">
+            <h1 id="result-title">MISSION COMPLETE</h1>
+            <p id="message"></p>
+            <button id="action-button">次のステージへ</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+</body>
+
+</html>

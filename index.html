@@ -27,8 +27,16 @@
                 style="color: #4488ff; border-color: #4488ff; opacity: 0;">NO DAMAGE</div>
         </div>
 
-        <!-- ゲームキャンバス -->
-        <canvas id="game-canvas"></canvas>
+        <!-- ゲームエリア (キャンバスとポーズオーバーレイ) -->
+        <div id="game-area">
+            <canvas id="game-canvas"></canvas>
+
+            <!-- オーバーレイ: 一時停止 (ゲームエリア内のみに適用) -->
+            <div id="overlay-pause" class="overlay hidden">
+                <h1>PAUSED</h1>
+                <p class="quote">「戦場での休息は死を意味する。」</p>
+            </div>
+        </div>
 
         <!-- コントローラー -->
         <div id="controls">
@@ -36,17 +44,11 @@
                 <div class="d-pad">
                     <div class="control-btn btn-up" id="btn-up" data-dir="up">↑</div>
                     <div class="control-btn btn-left" id="btn-left" data-dir="left">←</div>
-                    <button id="pause-btn">⏸</button>
+                    <button id="pause-btn">II</button>
                     <div class="control-btn btn-right" id="btn-right" data-dir="right">→</div>
                     <div class="control-btn btn-down" id="btn-down" data-dir="down">↓</div>
                 </div>
             </div>
-        </div>
-
-        <!-- オーバーレイ: 一時停止 -->
-        <div id="overlay-pause" class="overlay hidden">
-            <h1>PAUSED</h1>
-            <p class="quote">「戦場での休息は死を意味する。」</p>
         </div>
 
         <!-- オーバーレイ: タイトル -->

@@ -165,11 +165,11 @@ function togglePause() {
 
     if (state.isPaused) {
         state.running = false;
-        pauseBtn.textContent = '▶';
+        pauseBtn.textContent = '▶'; // ポーズ時は再開ボタンに
         overlayPause.classList.remove('hidden');
     } else {
         state.running = true;
-        pauseBtn.textContent = '⏸';
+        pauseBtn.textContent = 'II'; // 通常時はポーズボタンに
         overlayPause.classList.add('hidden');
         requestAnimationFrame(gameLoop);
     }
@@ -189,6 +189,7 @@ function startGame() {
     state.running = true;
     state.gauge = 0;
     state.currentStage = 0;
+    document.getElementById('pause-btn').textContent = 'II';
     resetInput();
     updateUI();
     resetStage();
@@ -196,6 +197,7 @@ function startGame() {
 }
 
 function handleAction() {
+    document.getElementById('pause-btn').textContent = 'II';
     if (state.isGameOver) {
         // リトライ
         state.currentStage = 0;

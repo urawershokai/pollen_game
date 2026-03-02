@@ -19,7 +19,7 @@ const SETTINGS = {
     heroSize: 48, // 表示サイズ（ピクセル）
     playerRadiusScale: 0.45, // min(w, h) * 0.45
     pollenRadius: 4, // P0: 大幅に小型化
-    treeSize: 80, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
+    treeSize: 200, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
     treeRadiusScale: 0.38, // 当たり判定のスケール（見た目より少し小さめ）
     speed: {
         hero: 6,

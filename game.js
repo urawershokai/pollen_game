@@ -19,8 +19,8 @@ const SETTINGS = {
     heroSize: 48, // 表示サイズ（ピクセル）
     playerRadiusScale: 0.45, // min(w, h) * 0.45
     pollenRadius: 4, // P0: 大幅に小型化
-    treeSize: 200, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
-    treeRadiusScale: 0.38, // 当たり判定のスケール（見た目より少し小さめ）
+    treeSize: 180, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
+    treeHitbox: { rxScale: 0.22, ryScale: 0.32 }, // 当たり判定（楕円）: 縦長の見た目に合わせて左右を厳しく
     speed: {
         hero: 6,
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
@@ -69,9 +69,12 @@ function getHeroRadius() {
     return SETTINGS.heroSize * SETTINGS.playerRadiusScale;
 }
 
-// 花粉樹（ボス）の当たり判定半径を取得
-function getTreeRadius() {
-    return SETTINGS.treeSize * SETTINGS.treeRadiusScale;
+// 花粉樹（ボス）の当たり判定（楕円）を取得
+function getTreeHitbox() {
+    return {
+        rx: SETTINGS.treeSize * SETTINGS.treeHitbox.rxScale,
+        ry: SETTINGS.treeSize * SETTINGS.treeHitbox.ryScale
+    };
 }
 
 // キャンバスのリサイズ
@@ -319,9 +322,15 @@ function update() {
         }
     });
 
-    // 衝突判定: 主人公 vs 花粉樹
-    const distToTree = Math.hypot(state.tree.x - state.hero.x, state.tree.y - state.hero.y);
-    if (distToTree < getTreeRadius() + heroRadius) {
+    // 衝突判定: 主人公 vs 花粉樹（楕円）
+    // ボスは縦長なので、左右の空白で当たらないよう楕円判定にする
+    const dxT = state.hero.x - state.tree.x;
+    const dyT = state.hero.y - state.tree.y;
+    const hb = getTreeHitbox();
+    const rx = hb.rx + heroRadius;
+    const ry = hb.ry + heroRadius;
+    const norm = (dxT * dxT) / (rx * rx) + (dyT * dyT) / (ry * ry);
+    if (norm < 1) {
         clearStage();
     }
 }

@@ -19,7 +19,8 @@ const SETTINGS = {
     heroSize: 48, // 表示サイズ（ピクセル）
     playerRadiusScale: 0.45, // min(w, h) * 0.45
     pollenRadius: 4, // P0: 大幅に小型化
-    treeRadius: 40,
+    treeSize: 80, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
+    treeRadiusScale: 0.38, // 当たり判定のスケール（見た目より少し小さめ）
     speed: {
         hero: 6,
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
@@ -37,6 +38,9 @@ const SETTINGS = {
 // 画像の読み込み
 const heroImg = new Image();
 heroImg.src = 'ax.png';
+
+const treeImg = new Image();
+treeImg.src = 'tree.png';
 
 // ゲーム状態
 let state = {
@@ -63,6 +67,11 @@ let state = {
 // プレイヤーの現在の当たり判定半径を取得
 function getHeroRadius() {
     return SETTINGS.heroSize * SETTINGS.playerRadiusScale;
+}
+
+// 花粉樹（ボス）の当たり判定半径を取得
+function getTreeRadius() {
+    return SETTINGS.treeSize * SETTINGS.treeRadiusScale;
 }
 
 // キャンバスのリサイズ
@@ -312,7 +321,7 @@ function update() {
 
     // 衝突判定: 主人公 vs 花粉樹
     const distToTree = Math.hypot(state.tree.x - state.hero.x, state.tree.y - state.hero.y);
-    if (distToTree < SETTINGS.treeRadius + heroRadius) {
+    if (distToTree < getTreeRadius() + heroRadius) {
         clearStage();
     }
 }
@@ -375,20 +384,21 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 花粉樹（ボス）
-    ctx.beginPath();
-    ctx.arc(state.tree.x, state.tree.y, SETTINGS.treeRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#1b3a1a';
-    ctx.fill();
-    ctx.strokeStyle = varToHex('--tree-color');
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    // 木の詳細
-    ctx.beginPath();
-    ctx.moveTo(state.tree.x - 20, state.tree.y + 10);
-    ctx.lineTo(state.tree.x, state.tree.y - 20);
-    ctx.lineTo(state.tree.x + 20, state.tree.y + 10);
-    ctx.fillStyle = '#2d5a27';
-    ctx.fill();
+    if (treeImg.complete) {
+        const size = SETTINGS.treeSize;
+        // 画像は中心座標 (state.tree.x, state.tree.y) を中心に描画
+        // トリム済み正方形(1:1)を維持
+        ctx.drawImage(treeImg, state.tree.x - size / 2, state.tree.y - size / 2, size, size);
+    } else {
+        // 画像読み込み前、またはエラー時の代替表示 (旧木描画に近いもの)
+        ctx.beginPath();
+        ctx.arc(state.tree.x, state.tree.y, SETTINGS.treeSize / 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#1b3a1a';
+        ctx.fill();
+        ctx.strokeStyle = varToHex('--tree-color');
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
 
     // 花粉
     state.pollens.forEach(p => {

@@ -28,7 +28,7 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 16000, //無敵時間　 でバックように自由に設定
+    invincibleDuration: 0, //無敵時間　 でバックように自由に設定
     maxGauge: 1, // P0: 1ヒット即死
     stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）
@@ -97,22 +97,44 @@ function generateStageConfig(stage) {
             pollenSpeed: 1.7,
             homing: true
         };
+    } else if (stage <= 55) {
+        // Stage 51-55: 2色混合
+        const total = 14 + (stage - 51) * 2;
+        const main = Math.round(total * 0.6);
+        const sub = total - main;
+        return { mix: { green: main, yellowgreen: sub } };
     } else if (stage <= 60) {
-        // Stage 51-60: 2色混合 (例: yellow + orange)
-        const total = 18 + (stage - 51) * 2;
-        const main = Math.round(total * 0.7);
+        const total = 14 + (stage - 56) * 2;
+        const main = Math.round(total * 0.6);
+        const sub = total - main;
+        return { mix: { yellowgreen: main, yellow: sub } };
+    } else if (stage <= 65) {
+        const total = 14 + (stage - 61) * 2;
+        const main = Math.round(total * 0.6);
         const sub = total - main;
         return { mix: { yellow: main, orange: sub } };
     } else if (stage <= 70) {
-        // Stage 61-70: 3色混合 (例: yellow + orange + red)
-        const total = 26 + (stage - 61) * 2;
-        const a = Math.round(total * 0.55);
+        const total = 14 + (stage - 66) * 2;
+        const a = Math.round(total * 0.40);
         const b = Math.round(total * 0.30);
         const c = total - a - b;
-        return { mix: { yellow: a, orange: b, red: c } };
+        return { mix: { yellow: a, green: b, yellowgreen: c } };
+    } else if (stage <= 75) {
+        // Stage 71-75: 3色混合
+        const total = 14 + (stage - 71) * 2;
+        const a = Math.round(total * 0.40);
+        const b = Math.round(total * 0.30);
+        const c = total - a - b;
+        return { mix: { orange: a, yellowgreen: b, red: c } };
+    } else if (stage <= 80) {
+        const total = 14 + (stage - 76) * 2;
+        const a = Math.round(total * 0.40);
+        const b = Math.round(total * 0.30);
+        const c = total - a - b;
+        return { mix: { red: a, orange: b, yellow: c } };
     } else {
-        // Stage 70 以降は Stage 70 の設定を維持
-        return generateStageConfig(70);
+        // Stage 80 以降は Stage 80 の設定を維持
+        return generateStageConfig(80);
     }
 }
 

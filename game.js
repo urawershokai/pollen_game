@@ -8,9 +8,13 @@ const stageNumEl = document.getElementById('stage-num');
 const overlayStart = document.getElementById('overlay-start');
 const overlayPause = document.getElementById('overlay-pause');
 const overlayMessage = document.getElementById('overlay-message');
+const overlayRank = document.getElementById('overlay-rank');
 const resultTitle = document.getElementById('result-title');
 const messageEl = document.getElementById('message');
 const actionBtn = document.getElementById('action-button');
+const rankBtnStart = document.getElementById('rank-button-start');
+const rankBtnMessage = document.getElementById('rank-button-message');
+const rankHomeBtn = document.getElementById('rank-home-button');
 
 // ゲーム設定
 const SETTINGS = {
@@ -220,6 +224,22 @@ function setupInputs() {
 
     // ポーズ関連 (中央ボタンに集約)
     document.getElementById('pause-btn').addEventListener('click', togglePause);
+
+    // ランキング関連
+    rankBtnStart.addEventListener('click', () => {
+        overlayStart.classList.add('hidden');
+        overlayRank.classList.remove('hidden');
+    });
+
+    rankBtnMessage.addEventListener('click', () => {
+        overlayMessage.classList.add('hidden');
+        overlayRank.classList.remove('hidden');
+    });
+
+    rankHomeBtn.addEventListener('click', () => {
+        overlayRank.classList.add('hidden');
+        overlayStart.classList.remove('hidden');
+    });
 }
 
 function togglePause() {
@@ -280,6 +300,7 @@ function triggerClearSequence() {
 
 function handleAction() {
     document.getElementById('pause-btn').textContent = 'II';
+    rankBtnMessage.classList.add('hidden');
     if (state.isGameOver) {
         // リトライ
         state.currentStage = 0;
@@ -453,6 +474,7 @@ function clearStage() {
     }
 
     overlayMessage.classList.remove('hidden');
+    rankBtnMessage.classList.add('hidden');
 }
 
 function gameOver() {
@@ -473,6 +495,7 @@ function gameOver() {
     actionBtn.textContent = "リトライ";
 
     overlayMessage.classList.remove('hidden');
+    rankBtnMessage.classList.remove('hidden');
 }
 
 function draw() {

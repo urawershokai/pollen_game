@@ -52,6 +52,7 @@
             <h1>花粉一掃作戦</h1>
             <p class="quote">「駆逐してやる、一粒残らず。」</p>
             <button id="start-button">伐採開始</button>
+            <button id="rank-button-start">ランキング</button>
         </div>
 
         <!-- オーバーレイ: メッセージ (クリア / ゲームオーバー) -->
@@ -59,6 +60,26 @@
             <h1 id="result-title">MISSION COMPLETE</h1>
             <p id="message"></p>
             <button id="action-button">次のステージへ</button>
+            <button id="rank-button-message" class="hidden">ランキング</button>
+        </div>
+
+        <!-- オーバーレイ: ランキング -->
+        <div id="overlay-rank" class="overlay hidden">
+            <h1>伐採ランキング</h1>
+            <div class="rank-list">
+                <div class="rank-item">1位 999株 伝説の株主 花粉太郎</div>
+                <div class="rank-item">2位 620株 鼻炎殺しの覇者 花粉ゼロ侍</div>
+                <div class="rank-item">3位 420株 伐採王 チェーンソー将軍</div>
+                <div class="rank-item">4位 333株 森の終焉 スギ許さないマン</div>
+                <div class="rank-item">5位 284株 伝説の木こり 太谷翔平</div>
+                <div class="rank-item">6位 222株 目薬の覇王 クリアアイ</div>
+                <div class="rank-item">7位 200株 吸気の鬼 鼻呼吸マスター</div>
+                <div class="rank-item">8位 180株 防塵の守護者 マスク二刀流</div>
+                <div class="rank-item">9位 150株 伐採訓練兵 初期装備</div>
+                <div class="rank-item">10位 120株 粘膜の戦士 花粉絶対敵</div>
+                <p class="rank-note">※伝説につき諸説あり</p>
+            </div>
+            <button id="rank-home-button">ホーム</button>
         </div>
     </div>
 

@@ -28,13 +28,14 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 1600, //無敵時間　 でバックように自由に設定
+    invincibleDuration: 0, //無敵時間　 でバックように自由に設定
     maxGauge: 1, // P0: 1ヒット即死
     stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）
     treeShakeAmplitude: 4,   // 揺れの強さ（ピクセル）
-    pollenZigFreq: 0.06,    // ジグザグ周波数
-    pollenZigAmp: 5         // ジグザグ振幅
+    pollenZigFreq: 0.035,   // ジグザグ周波数（小さいほどゆっくり切り替わる）
+    pollenZigAmp: 5         // ジグザグ振幅（大きいほど左右のブレ幅が増える）
+
 };
 
 // ステージ個別設定（1始まりのインデックス）
@@ -50,19 +51,19 @@ function generateStageConfig(stage) {
         // Stage 1-10: 6から開始、毎ステージ +3, 速度 1.6
         return {
             pollenCount: 6 + (stage - 1) * 3,
-            pollenSpeed: 1.6
+            pollenSpeed: 1.4
         };
     } else if (stage <= 20) {
         // Stage 11-20: 6から開始、毎ステージ +3, 速度 2.3
         return {
             pollenCount: 6 + (stage - 11) * 3,
-            pollenSpeed: 2.3
+            pollenSpeed: 2.1
         };
     } else if (stage <= 30) {
-        // Stage 21-30: Stage 11-20のロジックをベースにジグザグ追加
+        // Stage 21-30: 
         return {
             pollenCount: 6 + (stage - 21) * 3,
-            pollenSpeed: 2.3,
+            pollenSpeed: 1.6,
             zigzag: true
         };
     } else {
@@ -329,19 +330,14 @@ function handleAction() {
         state.running = true;
         requestAnimationFrame(gameLoop);
     } else if (state.isCleared) {
-        // 次のステージ。20までで一旦区切るが、継続可能
-        if (state.currentStage < 19) {
-            state.currentStage++;
-            resetInput();
-            resetStage();
-            state.isCleared = false;
-            overlayMessage.classList.add('hidden');
-            state.running = true;
-            requestAnimationFrame(gameLoop);
-        } else {
-            // 全クリア（Stage 20をクリアした時）
-            startGame(); // 最初から
-        }
+        // 次のステージへ（上限なし）
+        state.currentStage++;
+        resetInput();
+        resetStage();
+        state.isCleared = false;
+        overlayMessage.classList.add('hidden');
+        state.running = true;
+        requestAnimationFrame(gameLoop);
     }
 }
 
@@ -498,13 +494,7 @@ function clearStage() {
     resultTitle.style.color = "var(--safe-color)";
     messageEl.textContent = "「駆逐完了。」";
 
-    if (state.currentStage < 19) {
-        actionBtn.textContent = "次の伐採へ";
-    } else {
-        resultTitle.innerHTML = `全伐採完了！<br>${cleared}株目`;
-        messageEl.textContent = "「この世界から、一粒残らず駆逐した。」";
-        actionBtn.textContent = "最初から駆逐する";
-    }
+    actionBtn.textContent = "次の伐採へ";
 
     overlayMessage.classList.remove('hidden');
     rankBtnMessage.classList.add('hidden');

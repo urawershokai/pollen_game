@@ -242,7 +242,7 @@ function startGame() {
 function triggerClearSequence() {
     if (state.clearPending || state.isCleared || state.isGameOver) return;
 
-    state.running = false; // 演出中は停止
+    // state.running = false; // 演出中は停止（削除: ループは回し続ける）
     resetInput();
 
     state.treeIsDead = true;
@@ -315,6 +315,10 @@ function update() {
     if (state.clearPending && Date.now() >= state.clearAt) {
         state.clearPending = false;
         clearStage(); // ここで初めて MISSION COMPLETE 表示
+        return;
+    }
+    // クリア演出中はゲーム進行（移動・花粉更新）を止める。ただし draw() は回す
+    if (state.clearPending) {
         return;
     }
 

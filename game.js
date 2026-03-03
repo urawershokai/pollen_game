@@ -14,7 +14,7 @@ const actionBtn = document.getElementById('action-button');
 
 // ゲーム設定
 const SETTINGS = {
-    heroSize: 48, // 表示サイズ（ピクセル）
+    heroSize: 40, // 表示サイズ（ピクセル）
     playerRadiusScale: 0.45, // min(w, h) * 0.45
     pollenRadius: 4, // P0: 大幅に小型化
     treeSize: 180, // ボスの表示サイズ（現状の木と同程度から+10~20%を反映）
@@ -43,13 +43,13 @@ function generateStageConfig(stage) {
     if (stage <= 10) {
         // Stage 1-10: 12から開始、毎ステージ +4, 速度 1.6
         return {
-            pollenCount: 12 + (stage - 1) * 4,
+            pollenCount: 8 + (stage - 1) * 3,
             pollenSpeed: 1.6
         };
     } else if (stage <= 20) {
         // Stage 11-20: 4から開始、毎ステージ +4, 速度 2.3
         return {
-            pollenCount: 4 + (stage - 11) * 4,
+            pollenCount: 6 + (stage - 11) * 3,
             pollenSpeed: 2.3
         };
     } else {

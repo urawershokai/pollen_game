@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>花粉駆逐</title>
+    <title>花粉一掃作戦</title>
     <link rel="stylesheet" href="index.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff4444">
@@ -18,7 +18,8 @@
         <!-- 情報バー -->
         <div id="info-bar">
             <div>
-                <div class="status-item">STAGE: <span id="stage-num">1</span></div>
+                <div class="status-item"><span id="stage-num">1</span>株目</div>
+
             </div>
         </div>
 
@@ -29,7 +30,7 @@
             <!-- オーバーレイ: 一時停止 (ゲームエリア内のみに適用) -->
             <div id="overlay-pause" class="overlay hidden">
                 <h1>PAUSED</h1>
-                <p class="quote">「戦場での休息は死を意味する。」</p>
+                <p class="quote">「踏みにじられた人間の尊厳を取り戻すんだ。」</p>
             </div>
         </div>
 
@@ -48,9 +49,9 @@
 
         <!-- オーバーレイ: タイトル -->
         <div id="overlay-start" class="overlay">
-            <h1>花粉駆逐</h1>
+            <h1>花粉一掃作戦</h1>
             <p class="quote">「駆逐してやる、一粒残らず。」</p>
-            <button id="start-button">作戦開始</button>
+            <button id="start-button">伐採開始</button>
         </div>
 
         <!-- オーバーレイ: メッセージ (クリア / ゲームオーバー) -->

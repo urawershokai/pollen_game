@@ -401,10 +401,10 @@ function clearStage() {
 
     resultTitle.textContent = "MISSION COMPLETE";
     resultTitle.style.color = "var(--safe-color)";
-    messageEl.textContent = "「駆逐完了。奴らは全滅した。」";
+    messageEl.textContent = "「駆逐完了。」";
 
     if (state.currentStage < SETTINGS.stages.length - 1) {
-        actionBtn.textContent = "次の戦場へ";
+        actionBtn.textContent = "次の伐採へ";
     } else {
         resultTitle.textContent = "TOTAL CLEAR";
         messageEl.textContent = "「この世界から、一粒残らず駆逐した。」";
@@ -426,7 +426,7 @@ function gameOver() {
 
     resultTitle.textContent = "MISSION FAILED";
     resultTitle.style.color = "var(--danger-color)";
-    messageEl.textContent = "「くしゅん！ ...奴らは、まだ残っている。」";
+    messageEl.textContent = "「目が、目がぁぁ・・・。」";
     actionBtn.textContent = "リトライ";
 
     overlayMessage.classList.remove('hidden');

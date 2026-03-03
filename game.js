@@ -42,6 +42,9 @@ heroImg.src = 'ax.png';
 const treeImg = new Image();
 treeImg.src = 'tree.png';
 
+const treeDeadImg = new Image();
+treeDeadImg.src = 'tree_dead.png';
+
 // ゲーム状態
 let state = {
     currentStage: 0,
@@ -62,7 +65,11 @@ let state = {
         right: false,
         lastDir: null
     },
-    treeShakeUntil: 0 // 木の揺れ終了時刻
+    treeShakeUntil: 0, // 木の揺れ終了時刻
+    treeIsDead: false,
+    clearPending: false,
+    clearAt: 0,
+    treeHitShakeUntil: 0
 };
 
 // プレイヤーの現在の当たり判定半径を取得
@@ -232,6 +239,19 @@ function startGame() {
     requestAnimationFrame(gameLoop);
 }
 
+function triggerClearSequence() {
+    if (state.clearPending || state.isCleared || state.isGameOver) return;
+
+    state.running = false; // 演出中は停止
+    resetInput();
+
+    state.treeIsDead = true;
+    state.treeHitShakeUntil = Date.now() + 300;
+    state.clearPending = true;
+    state.clearAt = Date.now() + 350;
+    // ここでは overlayMessage を出さない（演出後に出す）
+}
+
 function handleAction() {
     document.getElementById('pause-btn').textContent = 'II';
     if (state.isGameOver) {
@@ -265,6 +285,8 @@ function resetStage() {
     initPosition();
     state.isInvincible = true;
     state.invincibleTimer = Date.now();
+    state.treeIsDead = false;
+    state.clearPending = false;
     updateUI();
 }
 
@@ -289,6 +311,13 @@ function gameLoop() {
 }
 
 function update() {
+    // クリア演出の監視
+    if (state.clearPending && Date.now() >= state.clearAt) {
+        state.clearPending = false;
+        clearStage(); // ここで初めて MISSION COMPLETE 表示
+        return;
+    }
+
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
     const heroRadius = getHeroRadius();
@@ -340,7 +369,7 @@ function update() {
     const ry = hb.ry + heroRadius;
     const norm = (dxT * dxT) / (rx * rx) + (dyT * dyT) / (ry * ry);
     if (norm < 1) {
-        clearStage();
+        triggerClearSequence();
     }
 }
 
@@ -412,10 +441,18 @@ function draw() {
         treeY += (Math.random() * 2 - 1) * SETTINGS.treeShakeAmplitude;
     }
 
-    if (treeImg.complete) {
+    // 撃破時の揺れ（左右のみガクガク揺らす）
+    if (Date.now() < state.treeHitShakeUntil) {
+        const shakeAmp = 8; // 6〜10の間
+        treeX += (Math.random() * 2 - 1) * shakeAmp;
+    }
+
+    const img = state.treeIsDead ? treeDeadImg : treeImg;
+
+    if (img.complete) {
         const size = SETTINGS.treeSize;
         // 画像は中心座標を中心に出力
-        ctx.drawImage(treeImg, treeX - size / 2, treeY - size / 2, size, size);
+        ctx.drawImage(img, treeX - size / 2, treeY - size / 2, size, size);
     } else {
         // 画像読み込み前、またはエラー時の代替表示
         ctx.beginPath();

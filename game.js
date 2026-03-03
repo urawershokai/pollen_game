@@ -26,14 +26,45 @@ const SETTINGS = {
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
     invincibleDuration: 0, //無敵時間　一旦これをカットする
     maxGauge: 1, // P0: 1ヒット即死
-    stages: [
-        { pollenCount: 12, pollenSpeed: 1.8 }, // ステージ1の大幅減速
-        { pollenCount: 22, pollenSpeed: 2.5 }, // 段階的な上昇
-        { pollenCount: 35, pollenSpeed: 3.5 }
-    ],
+    stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）
     treeShakeAmplitude: 4   // 揺れの強さ（ピクセル）
 };
+
+// ステージ個別設定（1始まりのインデックス）
+const STAGE_OVERRIDES = {
+    // 例: 7: { pollenCount: 28, pollenSpeed: 1.6 },
+};
+
+/**
+ * ステージ番号（1始まり）に基づいて設定を生成する（決定的）
+ */
+function generateStageConfig(stage) {
+    if (stage <= 10) {
+        // Stage 1-10: 12から開始、毎ステージ +4, 速度 1.6
+        return {
+            pollenCount: 12 + (stage - 1) * 4,
+            pollenSpeed: 1.6
+        };
+    } else if (stage <= 20) {
+        // Stage 11-20: 4から開始、毎ステージ +4, 速度 2.3
+        return {
+            pollenCount: 4 + (stage - 11) * 4,
+            pollenSpeed: 2.3
+        };
+    } else {
+        // Stage 20 以降は Stage 20 の設定を維持
+        return generateStageConfig(20);
+    }
+}
+
+/**
+ * ハイブリッド方式の設定取得
+ */
+function getStageConfig(stage) {
+    return STAGE_OVERRIDES[stage] ?? generateStageConfig(stage);
+}
+
 
 // 画像の読み込み
 const heroImg = new Image();
@@ -122,7 +153,8 @@ function initPosition() {
 
 // 花粉の初期化
 function initPollens(width, height) {
-    const config = SETTINGS.stages[state.currentStage];
+    const stage = state.currentStage + 1;
+    const config = getStageConfig(stage);
     state.pollens = [];
     const spawnRadius = Math.max(40, SETTINGS.treeSize * 0.25);
 
@@ -265,8 +297,8 @@ function handleAction() {
         state.running = true;
         requestAnimationFrame(gameLoop);
     } else if (state.isCleared) {
-        if (state.currentStage < SETTINGS.stages.length - 1) {
-            // 次のステージ
+        // 次のステージ。20までで一旦区切るが、継続可能
+        if (state.currentStage < 19) {
             state.currentStage++;
             resetInput();
             resetStage();
@@ -275,7 +307,7 @@ function handleAction() {
             state.running = true;
             requestAnimationFrame(gameLoop);
         } else {
-            // 全クリア
+            // 全クリア（Stage 20をクリアした時）
             startGame(); // 最初から
         }
     }
@@ -403,7 +435,7 @@ function clearStage() {
     resultTitle.style.color = "var(--safe-color)";
     messageEl.textContent = "「駆逐完了。」";
 
-    if (state.currentStage < SETTINGS.stages.length - 1) {
+    if (state.currentStage < 19) {
         actionBtn.textContent = "次の伐採へ";
     } else {
         resultTitle.textContent = "TOTAL CLEAR";

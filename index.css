@@ -100,14 +100,14 @@ h1 {
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.2rem;
-    text-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
 }
 
 .quote {
     font-style: italic;
     color: #888;
     margin-bottom: 2rem;
-    font-size: 0.9rem;
+    font-size: 1.3rem;
 }
 
 button {
@@ -289,8 +289,10 @@ button:active {
     animation: sneeze 0.5s ease-in-out;
 }
 
+/* クリア/失敗メッセージは名言（.quote）と同じ見た目に揃える */
 #message {
-    font-size: 1.5rem;
+    font-style: italic;
+    color: #888;
     margin-bottom: 2rem;
-    color: var(--text-color);
+    font-size: 1.3rem;
 }

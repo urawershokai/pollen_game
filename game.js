@@ -38,6 +38,15 @@ const SETTINGS = {
 
 };
 
+const POLLEN_COLORS = {
+    green: '#16a34a',       // 1-10
+    yellowgreen: '#a8ff44', // 11-20
+    yellow: '#e0e080',      // 21-30（今の色）
+    orange: '#ffa94d',      // 31-40
+    red: '#ff4444'          // 41-50
+};
+
+
 // ステージ個別設定（1始まりのインデックス）
 const STAGE_OVERRIDES = {
     // 例: 7: { pollenCount: 28, pollenSpeed: 1.6 },
@@ -207,16 +216,24 @@ function initPollens(width, height) {
         const p = {
             x, y,
             vx: Math.cos(angle) * config.pollenSpeed,
-            vy: Math.sin(angle) * config.pollenSpeed
+            vy: Math.sin(angle) * config.pollenSpeed,
+            type: 'green' // デフォルト
         };
 
+        // ステージ番号に基づくタイプ設定
+        if (stage <= 10) p.type = 'green';
+        else if (stage <= 20) p.type = 'yellowgreen';
+
+        // 特殊移動設定に基づくタイプの上書き
         if (config.zigzag) {
+            p.type = 'yellow';
             p.zigPhase = Math.random() * Math.PI * 2;
             p.zigFreq = SETTINGS.pollenZigFreq;
             p.zigAmp = SETTINGS.pollenZigAmp;
         }
 
         if (config.curve) {
+            p.type = 'orange';
             const base = 0.012;  // 最小
             const rand = 0.010;  // ばらつき
             p.omega = (base + Math.random() * rand) * (Math.random() < 0.5 ? 1 : -1);
@@ -224,6 +241,7 @@ function initPollens(width, height) {
         }
 
         if (config.homing) {
+            p.type = 'red';
             p.homing = true;
             p.homingSpeed = config.pollenSpeed;
             p.turnRate = 0.08; //どれだけ素早く向きを変えれるか
@@ -623,13 +641,14 @@ function draw() {
 
     // 花粉
     state.pollens.forEach(p => {
+        const c = POLLEN_COLORS[p.type] ?? varToHex('--pollen-color');
         ctx.beginPath();
         ctx.arc(p.x, p.y, SETTINGS.pollenRadius, 0, Math.PI * 2);
-        ctx.fillStyle = varToHex('--pollen-color');
+        ctx.fillStyle = c;
         ctx.fill();
 
         // 小型化に合わせてギザギザを簡略化
-        ctx.strokeStyle = varToHex('--pollen-color');
+        ctx.strokeStyle = c;
         ctx.lineWidth = 1;
         ctx.stroke();
     });

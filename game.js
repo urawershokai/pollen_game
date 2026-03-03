@@ -70,7 +70,7 @@ function generateStageConfig(stage) {
         // Stage 31-40: 旋回移動
         return {
             pollenCount: 6 + (stage - 31) * 2,
-            pollenSpeed: 1.8,
+            pollenSpeed: 2.2,
             curve: true
         };
     } else {

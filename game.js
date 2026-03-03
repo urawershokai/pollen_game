@@ -437,14 +437,17 @@ function clearStage() {
     state.isCleared = true;
     resetInput();
 
-    resultTitle.textContent = "MISSION COMPLETE";
+    const cleared = state.currentStage + 1;
+
+    // 伐採成功表示（2行）
+    resultTitle.innerHTML = `伐採成功<br>${cleared}株目`;
     resultTitle.style.color = "var(--safe-color)";
     messageEl.textContent = "「駆逐完了。」";
 
     if (state.currentStage < 19) {
         actionBtn.textContent = "次の伐採へ";
     } else {
-        resultTitle.textContent = "TOTAL CLEAR";
+        resultTitle.innerHTML = `全伐採完了！<br>${cleared}株目`;
         messageEl.textContent = "「この世界から、一粒残らず駆逐した。」";
         actionBtn.textContent = "最初から駆逐する";
     }
@@ -462,7 +465,9 @@ function gameOver() {
     void document.body.offsetWidth; // reflow: アニメを毎回再発火させる
     document.body.classList.add('sneezing');
 
-    resultTitle.textContent = "MISSION FAILED";
+    // 伐採失敗表示（2行）: 記録＝クリアした数
+    const record = state.currentStage;
+    resultTitle.innerHTML = `伐採失敗<br>記録 ${record}株`;
     resultTitle.style.color = "var(--danger-color)";
     messageEl.textContent = "「目が、目がぁぁ・・・。」";
     actionBtn.textContent = "リトライ";

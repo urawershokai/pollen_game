@@ -38,12 +38,20 @@ const SETTINGS = {
 
 };
 
+const TYPE_STATS = {
+    green: { speed: 1.2 },
+    yellowgreen: { speed: 2.2 },
+    yellow: { speed: 1.4, zigzag: { amp: SETTINGS.pollenZigAmp, freq: SETTINGS.pollenZigFreq } },
+    orange: { speed: 2.2, curve: { omegaBase: 0.012, omegaRand: 0.010 } },
+    red: { speed: 1.7, homing: { turnRate: 0.08, reacquireMs: 60 } }
+};
+
 const POLLEN_COLORS = {
-    green: '#16a34a',       // 1-10
-    yellowgreen: '#a8ff44', // 11-20
-    yellow: '#e0e080',      // 21-30（今の色）
-    orange: '#ffa94d',      // 31-40
-    red: '#ff4444'          // 41-50
+    green: '#22C55E',
+    yellowgreen: '#A8FF44',
+    yellow: '#e0e080',
+    orange: '#ffa94d',
+    red: '#ff4444'
 };
 
 
@@ -202,27 +210,27 @@ function initPosition() {
 }
 
 // 花粉の挙動パラメータをタイプに基づいて付与する
-function assignPollenBehavior(p, type, speed, config) {
+function assignPollenBehavior(p, type, speed) {
     p.type = type;
+    const stats = TYPE_STATS[type];
+    if (!stats) return;
 
-    if (type === 'yellow') {
+    if (stats.zigzag) {
         p.zigPhase = Math.random() * Math.PI * 2;
-        p.zigFreq = SETTINGS.pollenZigFreq;
-        p.zigAmp = SETTINGS.pollenZigAmp;
-    } else if (type === 'orange') {
-        p.type = 'orange';
-        const base = 0.012;  // 最小
-        const rand = 0.010;  // ばらつき
+        p.zigFreq = stats.zigzag.freq || SETTINGS.pollenZigFreq;
+        p.zigAmp = stats.zigzag.amp || SETTINGS.pollenZigAmp;
+    } else if (stats.curve) {
+        const base = stats.curve.omegaBase || 0.012;
+        const rand = stats.curve.omegaRand || 0.010;
         p.omega = (base + Math.random() * rand) * (Math.random() < 0.5 ? 1 : -1);
         p.pollenSpeed = speed; // 正規化用
-    } else if (type === 'red') {
+    } else if (stats.homing) {
         p.homing = true;
         p.homingSpeed = speed;
-        p.turnRate = 0.08; //どれだけ素早く向きを変えれるか
-        p.reacquireMs = 60; //  小さいほど追尾の更新が多い
+        p.turnRate = stats.homing.turnRate || 0.08;
+        p.reacquireMs = stats.homing.reacquireMs || 60;
         p.nextReacquire = Date.now() + Math.random() * 120;
     }
-    // green, yellowgreen は直線（追加パラメータなし）
 }
 
 // 花粉の初期化
@@ -232,12 +240,23 @@ function initPollens(width, height) {
     state.pollens = [];
     const spawnRadius = Math.max(40, SETTINGS.treeSize * 0.25);
 
-    // mix設定がある場合はそれを使用、ない場合は単一typeの設定として扱う
-    const entries = config.mix
-        ? Object.entries(config.mix)
-        : [[calculateDefaultType(stage, config), config.pollenCount]];
+    // mix設定がある場合はそれを使用、ない場合は単一typeの設定として扱う (既存互換)
+    let entries;
+    if (config.mix) {
+        entries = Object.entries(config.mix);
+    } else {
+        const defaultType = stage <= 10 ? 'green'
+            : stage <= 20 ? 'yellowgreen'
+                : stage <= 30 ? 'yellow'
+                    : stage <= 40 ? 'orange'
+                        : 'red';
+        entries = [[defaultType, config.pollenCount]];
+    }
 
     for (const [type, count] of entries) {
+        const stats = TYPE_STATS[type] || { speed: 1.2 };
+        const speed = stats.speed * (config.speedScale ?? 1);
+
         for (let i = 0; i < count; i++) {
             let x, y, dist;
             do {
@@ -258,11 +277,11 @@ function initPollens(width, height) {
             const angle = Math.random() * Math.PI * 2;
             const p = {
                 x, y,
-                vx: Math.cos(angle) * config.pollenSpeed,
-                vy: Math.sin(angle) * config.pollenSpeed
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed
             };
 
-            assignPollenBehavior(p, type, config.pollenSpeed, config);
+            assignPollenBehavior(p, type, speed);
 
             state.pollens.push(p);
         }
@@ -272,15 +291,7 @@ function initPollens(width, height) {
     state.treeShakeUntil = Date.now() + SETTINGS.treeShakeDuration;
 }
 
-// 1-50用のデフォルトタイプ判定
-function calculateDefaultType(stage, config) {
-    if (config.homing) return 'red';
-    if (config.curve) return 'orange';
-    if (config.zigzag) return 'yellow';
-    if (stage <= 10) return 'green';
-    if (stage <= 20) return 'yellowgreen';
-    return 'green';
-}
+// (未使用になったが将来の互換性のために一旦削除せずにおくか、不要なら削除。今回はリフローに合わせて整理)
 
 // 入力設定 (Pointer Events)
 function setupInputs() {

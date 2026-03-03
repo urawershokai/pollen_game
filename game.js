@@ -73,9 +73,16 @@ function generateStageConfig(stage) {
             pollenSpeed: 2.2,
             curve: true
         };
+    } else if (stage <= 50) {
+        // Stage 41-50: ホーミング
+        return {
+            pollenCount: 8 + (stage - 41) * 1,
+            pollenSpeed: 1.5,
+            homing: true
+        };
     } else {
-        // Stage 40 以降は Stage 40 の設定を維持
-        return generateStageConfig(40);
+        // Stage 50 以降は Stage 50 の設定を維持
+        return generateStageConfig(50);
     }
 }
 
@@ -214,6 +221,14 @@ function initPollens(width, height) {
             const rand = 0.010;  // ばらつき
             p.omega = (base + Math.random() * rand) * (Math.random() < 0.5 ? 1 : -1);
             p.pollenSpeed = config.pollenSpeed; // 正規化用
+        }
+
+        if (config.homing) {
+            p.homing = true;
+            p.homingSpeed = config.pollenSpeed;
+            p.turnRate = 0.04;
+            p.reacquireMs = 120;
+            p.nextReacquire = Date.now() + Math.random() * 120;
         }
 
         state.pollens.push(p);
@@ -433,7 +448,28 @@ function update() {
         p.y += p.vy;
 
         // 特殊移動の適用 (排他的)
-        if (p.omega) {
+        if (p.homing) {
+            // ホーミング（ゆる追尾）移動
+            if (Date.now() >= p.nextReacquire) {
+                const tx = state.hero.x - p.x;
+                const ty = state.hero.y - p.y;
+                const targetAngle = Math.atan2(ty, tx);
+                const currentAngle = Math.atan2(p.vy, p.vx);
+
+                // 角度差を [-PI, PI] に正規化
+                let d = targetAngle - currentAngle;
+                while (d > Math.PI) d -= Math.PI * 2;
+                while (d < -Math.PI) d += Math.PI * 2;
+
+                // ゆるく曲げる
+                const turn = Math.max(-p.turnRate, Math.min(p.turnRate, d));
+                const newAngle = currentAngle + turn;
+
+                p.vx = Math.cos(newAngle) * p.homingSpeed;
+                p.vy = Math.sin(newAngle) * p.homingSpeed;
+                p.nextReacquire = Date.now() + p.reacquireMs;
+            }
+        } else if (p.omega) {
             // 旋回（曲線）移動
             const cosO = Math.cos(p.omega);
             const sinO = Math.sin(p.omega);

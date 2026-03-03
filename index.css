@@ -84,7 +84,8 @@ body {
 
 /* タイトルとメッセージ用 overlay は操作を許可 */
 #overlay-start,
-#overlay-message {
+#overlay-message,
+#overlay-rank {
     pointer-events: auto;
 }
 

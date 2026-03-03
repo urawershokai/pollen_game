@@ -114,12 +114,22 @@ function initPosition() {
 function initPollens(width, height) {
     const config = SETTINGS.stages[state.currentStage];
     state.pollens = [];
+    const spawnRadius = Math.max(40, SETTINGS.treeSize * 0.25);
 
     for (let i = 0; i < config.pollenCount; i++) {
         let x, y, dist;
         do {
-            x = Math.random() * (width - SETTINGS.pollenRadius * 2) + SETTINGS.pollenRadius;
-            y = Math.random() * (height - SETTINGS.pollenRadius * 2) + SETTINGS.pollenRadius;
+            // 木の周辺から座標を生成
+            const r = Math.random() * spawnRadius;
+            const theta = Math.random() * Math.PI * 2;
+            x = state.tree.x + Math.cos(theta) * r;
+            y = state.tree.y + Math.sin(theta) * r;
+
+            // 画面内にクランプ (花粉の半径を考慮)
+            x = Math.max(SETTINGS.pollenRadius, Math.min(width - SETTINGS.pollenRadius, x));
+            y = Math.max(SETTINGS.pollenRadius, Math.min(height - SETTINGS.pollenRadius, y));
+
+            // プレイヤーとの距離を確認（安全マージン）
             dist = Math.hypot(x - state.hero.x, y - state.hero.y);
         } while (dist < SETTINGS.spawnSafetyMargin);
 

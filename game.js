@@ -24,7 +24,7 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 1000,
+    invincibleDuration: 0, //無敵時間　一旦これをカットする
     maxGauge: 1, // P0: 1ヒット即死
     stages: [
         { pollenCount: 12, pollenSpeed: 1.8 }, // ステージ1の大幅減速

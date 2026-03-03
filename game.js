@@ -102,14 +102,14 @@ function generateStageConfig(stage) {
         const total = 18 + (stage - 51) * 2;
         const main = Math.round(total * 0.7);
         const sub = total - main;
-        return { mix: { yellow: main, orange: sub }, pollenSpeed: 1.8 };
+        return { mix: { yellow: main, orange: sub } };
     } else if (stage <= 70) {
         // Stage 61-70: 3色混合 (例: yellow + orange + red)
         const total = 26 + (stage - 61) * 2;
         const a = Math.round(total * 0.55);
         const b = Math.round(total * 0.30);
         const c = total - a - b;
-        return { mix: { yellow: a, orange: b, red: c }, pollenSpeed: 2.0 };
+        return { mix: { yellow: a, orange: b, red: c } };
     } else {
         // Stage 70 以降は Stage 70 の設定を維持
         return generateStageConfig(70);

@@ -371,6 +371,8 @@ function gameOver() {
     resetInput();
 
     // 特大くしゃみ
+    document.body.classList.remove('sneezing');
+    void document.body.offsetWidth; // reflow: アニメを毎回再発火させる
     document.body.classList.add('sneezing');
 
     resultTitle.textContent = "MISSION FAILED";

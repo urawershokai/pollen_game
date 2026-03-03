@@ -30,7 +30,9 @@ const SETTINGS = {
         { pollenCount: 12, pollenSpeed: 1.8 }, // ステージ1の大幅減速
         { pollenCount: 22, pollenSpeed: 2.5 }, // 段階的な上昇
         { pollenCount: 35, pollenSpeed: 3.5 }
-    ]
+    ],
+    treeShakeDuration: 400, // 揺れの時間（ミリ秒）
+    treeShakeAmplitude: 4   // 揺れの強さ（ピクセル）
 };
 
 // 画像の読み込み
@@ -59,7 +61,8 @@ let state = {
         left: false,
         right: false,
         lastDir: null
-    }
+    },
+    treeShakeUntil: 0 // 木の揺れ終了時刻
 };
 
 // プレイヤーの現在の当たり判定半径を取得
@@ -140,6 +143,9 @@ function initPollens(width, height) {
             vy: Math.sin(angle) * config.pollenSpeed
         });
     }
+
+    // 木の揺れを開始
+    state.treeShakeUntil = Date.now() + SETTINGS.treeShakeDuration;
 }
 
 // 入力設定 (Pointer Events)
@@ -397,15 +403,23 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 花粉樹（ボス）
+    let treeX = state.tree.x;
+    let treeY = state.tree.y;
+
+    // 揺れ演出の計算
+    if (Date.now() < state.treeShakeUntil) {
+        treeX += (Math.random() * 2 - 1) * SETTINGS.treeShakeAmplitude;
+        treeY += (Math.random() * 2 - 1) * SETTINGS.treeShakeAmplitude;
+    }
+
     if (treeImg.complete) {
         const size = SETTINGS.treeSize;
-        // 画像は中心座標 (state.tree.x, state.tree.y) を中心に描画
-        // トリム済み正方形(1:1)を維持
-        ctx.drawImage(treeImg, state.tree.x - size / 2, state.tree.y - size / 2, size, size);
+        // 画像は中心座標を中心に出力
+        ctx.drawImage(treeImg, treeX - size / 2, treeY - size / 2, size, size);
     } else {
-        // 画像読み込み前、またはエラー時の代替表示 (旧木描画に近いもの)
+        // 画像読み込み前、またはエラー時の代替表示
         ctx.beginPath();
-        ctx.arc(state.tree.x, state.tree.y, SETTINGS.treeSize / 2, 0, Math.PI * 2);
+        ctx.arc(treeX, treeY, SETTINGS.treeSize / 2, 0, Math.PI * 2);
         ctx.fillStyle = '#1b3a1a';
         ctx.fill();
         ctx.strokeStyle = varToHex('--tree-color');

@@ -43,13 +43,13 @@ function generateStageConfig(stage) {
     if (stage <= 10) {
         // Stage 1-10: 12から開始、毎ステージ +4, 速度 1.6
         return {
-            pollenCount: 8 + (stage - 1) * 3,
+            pollenCount: 12 + (stage - 1) * 4,
             pollenSpeed: 1.6
         };
     } else if (stage <= 20) {
         // Stage 11-20: 4から開始、毎ステージ +4, 速度 2.3
         return {
-            pollenCount: 6 + (stage - 11) * 3,
+            pollenCount: 4 + (stage - 11) * 4,
             pollenSpeed: 2.3
         };
     } else {
@@ -197,28 +197,22 @@ function setupInputs() {
         btn.addEventListener('pointerdown', (e) => {
             if (state.isPaused) return; // ポーズ中は無効
             e.preventDefault();
-            // 一旦すべての入力をリセットしてから最新をセット（最後押し優先）
-            // 仕様に合わせて "最後に押した方向を優先" するため
-            state.input.up = false;
-            state.input.down = false;
-            state.input.left = false;
-            state.input.right = false;
-
+            // 他方向をリセットせず、現在の方向のみセット
             state.input[dir] = true;
             state.input.lastDir = dir;
         });
 
         // 共通の停止処理
         const stop = (e) => {
+            state.input[dir] = false;
             if (state.input.lastDir === dir) {
-                state.input[dir] = false;
                 state.input.lastDir = null;
             }
         };
 
         btn.addEventListener('pointerup', stop);
         btn.addEventListener('pointercancel', stop);
-        // pointerleave は明示的に要件により除外（ボタンからズレても継続）
+        btn.addEventListener('pointerleave', stop); // ボタンから指が離れた場合も停止
     });
 
     document.getElementById('start-button').addEventListener('click', startGame);
@@ -363,11 +357,23 @@ function update() {
         state.isInvincible = false;
     }
 
-    // 主人公移動
-    if (state.input.up) state.hero.y -= SETTINGS.speed.hero;
-    if (state.input.down) state.hero.y += SETTINGS.speed.hero;
-    if (state.input.left) state.hero.x -= SETTINGS.speed.hero;
-    if (state.input.right) state.hero.x += SETTINGS.speed.hero;
+    // 主人公移動（斜め対応・正規化）
+    let dx = 0;
+    let dy = 0;
+    if (state.input.up) dy -= 1;
+    if (state.input.down) dy += 1;
+    if (state.input.left) dx -= 1;
+    if (state.input.right) dx += 1;
+
+    if (dx !== 0 || dy !== 0) {
+        // 斜め移動時の正規化
+        const length = Math.hypot(dx, dy);
+        const nx = dx / length;
+        const ny = dy / length;
+
+        state.hero.x += nx * SETTINGS.speed.hero;
+        state.hero.y += ny * SETTINGS.speed.hero;
+    }
 
     // 画面外ブロック（見た目の端ではなく、中心座標の制限として heroRadius を使用）
     state.hero.x = Math.max(heroRadius, Math.min(width - heroRadius, state.hero.x));

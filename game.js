@@ -41,15 +41,15 @@ const STAGE_OVERRIDES = {
  */
 function generateStageConfig(stage) {
     if (stage <= 10) {
-        // Stage 1-10: 12から開始、毎ステージ +4, 速度 1.6
+        // Stage 1-10: 6から開始、毎ステージ +3, 速度 1.6
         return {
-            pollenCount: 12 + (stage - 1) * 4,
+            pollenCount: 6 + (stage - 1) * 3,
             pollenSpeed: 1.6
         };
     } else if (stage <= 20) {
-        // Stage 11-20: 4から開始、毎ステージ +4, 速度 2.3
+        // Stage 11-20: 6から開始、毎ステージ +3, 速度 2.3
         return {
-            pollenCount: 4 + (stage - 11) * 4,
+            pollenCount: 6 + (stage - 11) * 3,
             pollenSpeed: 2.3
         };
     } else {

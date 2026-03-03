@@ -154,25 +154,6 @@ button:active {
     font-weight: bold;
 }
 
-#gauge-container {
-    display: flex;
-    gap: 5px;
-    margin-top: 5px;
-}
-
-.gauge-unit {
-    width: 30px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    transition: background 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.gauge-unit.active {
-    background: var(--danger-color);
-    box-shadow: 0 0 15px var(--danger-color);
-}
 
 /* Pause Button (中央ボタン：絶対配置で厳密センターにする) */
 #pause-btn {

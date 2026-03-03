@@ -28,7 +28,7 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 1600, //無敵時間　 でバックように自由に設定
+    invincibleDuration: 16000, //無敵時間　 でバックように自由に設定
     maxGauge: 1, // P0: 1ヒット即死
     stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）

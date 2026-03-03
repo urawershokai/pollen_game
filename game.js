@@ -66,9 +66,16 @@ function generateStageConfig(stage) {
             pollenSpeed: 1.4,
             zigzag: true
         };
+    } else if (stage <= 40) {
+        // Stage 31-40: 旋回移動
+        return {
+            pollenCount: 6 + (stage - 31) * 2,
+            pollenSpeed: 1.8,
+            curve: true
+        };
     } else {
-        // Stage 30 以降は Stage 30 の設定を維持
-        return generateStageConfig(30);
+        // Stage 40 以降は Stage 40 の設定を維持
+        return generateStageConfig(40);
     }
 }
 
@@ -200,6 +207,13 @@ function initPollens(width, height) {
             p.zigPhase = Math.random() * Math.PI * 2;
             p.zigFreq = SETTINGS.pollenZigFreq;
             p.zigAmp = SETTINGS.pollenZigAmp;
+        }
+
+        if (config.curve) {
+            const base = 0.012;  // 最小
+            const rand = 0.010;  // ばらつき
+            p.omega = (base + Math.random() * rand) * (Math.random() < 0.5 ? 1 : -1);
+            p.pollenSpeed = config.pollenSpeed; // 正規化用
         }
 
         state.pollens.push(p);
@@ -418,8 +432,22 @@ function update() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // ジグザグ移動の適用
-        if (p.zigAmp) {
+        // 特殊移動の適用 (排他的)
+        if (p.omega) {
+            // 旋回（曲線）移動
+            const cosO = Math.cos(p.omega);
+            const sinO = Math.sin(p.omega);
+            const vx2 = p.vx * cosO - p.vy * sinO;
+            const vy2 = p.vx * sinO + p.vy * cosO;
+
+            // 速度の正規化（重要）
+            const length = Math.hypot(vx2, vy2);
+            if (length > 0) {
+                p.vx = (vx2 / length) * p.pollenSpeed;
+                p.vy = (vy2 / length) * p.pollenSpeed;
+            }
+        } else if (p.zigAmp) {
+            // ジグザグ移動
             const speed = Math.hypot(p.vx, p.vy);
             if (speed > 0) {
                 // 進行方向に直交する方向 (perp)

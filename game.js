@@ -5,8 +5,6 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const stageNumEl = document.getElementById('stage-num');
-const gaugeUnits = document.querySelectorAll('.gauge-unit');
-const invIndicator = document.getElementById('invincible-indicator');
 const overlayStart = document.getElementById('overlay-start');
 const overlayPause = document.getElementById('overlay-pause');
 const overlayMessage = document.getElementById('overlay-message');
@@ -251,7 +249,6 @@ function resetStage() {
     initPosition();
     state.isInvincible = true;
     state.invincibleTimer = Date.now();
-    invIndicator.style.opacity = '1';
     updateUI();
 }
 
@@ -263,9 +260,6 @@ document.addEventListener('visibilitychange', () => {
 
 function updateUI() {
     stageNumEl.textContent = state.currentStage + 1;
-    gaugeUnits.forEach((unit, idx) => {
-        unit.classList.toggle('active', idx < state.gauge);
-    });
 }
 
 // メインループ
@@ -286,7 +280,6 @@ function update() {
     // 無敵タイマー
     if (state.isInvincible && Date.now() - state.invincibleTimer > SETTINGS.invincibleDuration) {
         state.isInvincible = false;
-        invIndicator.style.opacity = '0';
     }
 
     // 主人公移動
@@ -342,7 +335,6 @@ function hitPollen() {
     // 短い無敵時間付与（連続ダメージ防止）
     state.isInvincible = true;
     state.invincibleTimer = Date.now();
-    invIndicator.style.opacity = '0.5';
 
     if (state.gauge >= SETTINGS.maxGauge) {
         gameOver();

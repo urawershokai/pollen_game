@@ -28,7 +28,7 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 0, //無敵時間　 でバックように自由に設定
+    invincibleDuration: 1600, //無敵時間　 でバックように自由に設定
     maxGauge: 1, // P0: 1ヒット即死
     stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）
@@ -48,22 +48,22 @@ const STAGE_OVERRIDES = {
  */
 function generateStageConfig(stage) {
     if (stage <= 10) {
-        // Stage 1-10: 6から開始、毎ステージ +3, 速度 1.6
+        // Stage 1-10: 
         return {
-            pollenCount: 6 + (stage - 1) * 3,
-            pollenSpeed: 1.4
+            pollenCount: 6 + (stage - 1) * 2,
+            pollenSpeed: 1.2
         };
     } else if (stage <= 20) {
-        // Stage 11-20: 6から開始、毎ステージ +3, 速度 2.3
+        // Stage 11-20:
         return {
-            pollenCount: 6 + (stage - 11) * 3,
-            pollenSpeed: 2.1
+            pollenCount: 6 + (stage - 11) * 2,
+            pollenSpeed: 2.2
         };
     } else if (stage <= 30) {
         // Stage 21-30: 
         return {
-            pollenCount: 6 + (stage - 21) * 3,
-            pollenSpeed: 1.6,
+            pollenCount: 6 + (stage - 21) * 2,
+            pollenSpeed: 1.4,
             zigzag: true
         };
     } else {

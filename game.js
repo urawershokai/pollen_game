@@ -54,6 +54,43 @@ const POLLEN_COLORS = {
     red: '#ff4444'
 };
 
+const FAIL_QUOTES = [
+    "「目が、目がぁぁ・・・。」",
+    "目が、目がぁああ、痒い",
+    "鼻水で呼吸ができない・・・。助けて・・・。",
+    "花粉で微熱が・・・。今日は会社を休もう。",
+    "眼球を洗いたい！目を取り出して洗いたい",
+    "もう、春やだ・・・",
+    "杉を植えたの誰だよ？",
+    "少子化問題よりも、まず、花粉問題を解決してくれ",
+    "日本の衰退は花粉の飛散量とともに悲惨になっていく",
+    "花粉、満員電車、物価高・・・僕は北海道へ行きます",
+    "「春よこい？」ふざけるな",
+    "鼻水が止まらない。私は今日死ぬだろう。脱水症状で。",
+    "今年こそは大丈夫、と思ってもう何年苦しんでいるのだろうか？",
+    "頭痛すら引き起こす、それが花粉症",
+    "花粉ごときに…俺が…俺がぁ…！",
+    "花粉の許容量ってなんやねん・・・もう嫌だよ・・・",
+    "花粉症の人間は人生の４分の一を失っている",
+    "もういい、目を擦るわ。気持ちいいい",
+    "車に花粉が積もってる。おい、杉はどこにあるんだ？どこから飛んできてる？"
+];
+
+let lastFailQuoteIndex = -1;
+
+/**
+ * 重複を避けつつランダムな失敗セリフを取得する
+ */
+function getRandomFailQuote() {
+    let index;
+    do {
+        index = Math.floor(Math.random() * FAIL_QUOTES.length);
+    } while (index === lastFailQuoteIndex && FAIL_QUOTES.length > 1);
+
+    lastFailQuoteIndex = index;
+    return FAIL_QUOTES[index];
+}
+
 
 // ステージ個別設定（1始まりのインデックス）
 const STAGE_OVERRIDES = {
@@ -655,7 +692,7 @@ function gameOver() {
     const record = state.currentStage;
     resultTitle.innerHTML = `伐採失敗<br>記録 ${record}株`;
     resultTitle.style.color = "var(--danger-color)";
-    messageEl.textContent = "「目が、目がぁぁ・・・。」";
+    messageEl.textContent = getRandomFailQuote();
     actionBtn.textContent = "リトライ";
 
     overlayMessage.classList.remove('hidden');

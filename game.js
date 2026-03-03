@@ -76,8 +76,8 @@ function generateStageConfig(stage) {
     } else if (stage <= 50) {
         // Stage 41-50: ホーミング
         return {
-            pollenCount: 8 + (stage - 41) * 1,
-            pollenSpeed: 1.5,
+            pollenCount: 4 + (stage - 41) * 1,
+            pollenSpeed: 1.7,
             homing: true
         };
     } else {
@@ -226,8 +226,8 @@ function initPollens(width, height) {
         if (config.homing) {
             p.homing = true;
             p.homingSpeed = config.pollenSpeed;
-            p.turnRate = 0.04;
-            p.reacquireMs = 120;
+            p.turnRate = 0.08; //どれだけ素早く向きを変えれるか
+            p.reacquireMs = 60; //  小さいほど追尾の更新が多い
             p.nextReacquire = Date.now() + Math.random() * 120;
         }
 

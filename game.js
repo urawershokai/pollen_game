@@ -28,11 +28,13 @@ const SETTINGS = {
         pollenBase: 1.8 // P0: 2.5 -> 1.8 (約72%)
     },
     spawnSafetyMargin: 180, // プレイヤーからの最低距離を拡大
-    invincibleDuration: 0, //無敵時間　一旦これをカットする
+    invincibleDuration: 1600, //無敵時間　 でバックように自由に設定
     maxGauge: 1, // P0: 1ヒット即死
     stages: [], // 今後は getStageConfig() を使用
     treeShakeDuration: 400, // 揺れの時間（ミリ秒）
-    treeShakeAmplitude: 4   // 揺れの強さ（ピクセル）
+    treeShakeAmplitude: 4,   // 揺れの強さ（ピクセル）
+    pollenZigFreq: 0.06,    // ジグザグ周波数
+    pollenZigAmp: 5         // ジグザグ振幅
 };
 
 // ステージ個別設定（1始まりのインデックス）
@@ -56,9 +58,16 @@ function generateStageConfig(stage) {
             pollenCount: 6 + (stage - 11) * 3,
             pollenSpeed: 2.3
         };
+    } else if (stage <= 30) {
+        // Stage 21-30: Stage 11-20のロジックをベースにジグザグ追加
+        return {
+            pollenCount: 6 + (stage - 21) * 3,
+            pollenSpeed: 2.3,
+            zigzag: true
+        };
     } else {
-        // Stage 20 以降は Stage 20 の設定を維持
-        return generateStageConfig(20);
+        // Stage 30 以降は Stage 30 の設定を維持
+        return generateStageConfig(30);
     }
 }
 
@@ -180,11 +189,19 @@ function initPollens(width, height) {
         } while (dist < SETTINGS.spawnSafetyMargin);
 
         const angle = Math.random() * Math.PI * 2;
-        state.pollens.push({
+        const p = {
             x, y,
             vx: Math.cos(angle) * config.pollenSpeed,
             vy: Math.sin(angle) * config.pollenSpeed
-        });
+        };
+
+        if (config.zigzag) {
+            p.zigPhase = Math.random() * Math.PI * 2;
+            p.zigFreq = SETTINGS.pollenZigFreq;
+            p.zigAmp = SETTINGS.pollenZigAmp;
+        }
+
+        state.pollens.push(p);
     }
 
     // 木の揺れを開始
@@ -404,6 +421,22 @@ function update() {
     state.pollens.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
+
+        // ジグザグ移動の適用
+        if (p.zigAmp) {
+            const speed = Math.hypot(p.vx, p.vy);
+            if (speed > 0) {
+                // 進行方向に直交する方向 (perp)
+                const px = -p.vy / speed;
+                const py = p.vx / speed;
+                // オフセット計算
+                const t = Date.now() * p.zigFreq + p.zigPhase;
+                const z = Math.sign(Math.sin(t)) * p.zigAmp;
+                // オフセット適用
+                p.x += px * z;
+                p.y += py * z;
+            }
+        }
 
         if (p.x < SETTINGS.pollenRadius || p.x > width - SETTINGS.pollenRadius) {
             p.vx *= -1;

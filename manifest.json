@@ -1,7 +1,7 @@
 {
-  "name": "花粉駆逐",
-  "short_name": "花粉駆逐",
-  "description": "花粉を駆逐するシリアスなミニゲーム",
+  "name": "花粉Dodge!",
+  "short_name": "花粉Dodge!",
+  "description": "花粉症になんて負けない。駆逐してやる。奴らを。",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0a",

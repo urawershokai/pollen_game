@@ -99,7 +99,6 @@ h1 {
     font-size: 3rem;
     color: var(--danger-color);
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
     letter-spacing: 0.2rem;
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
 }

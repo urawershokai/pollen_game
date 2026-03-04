@@ -76,6 +76,30 @@ function getRandomFailQuote() {
     return FAIL_QUOTES[index];
 }
 
+const CLEAR_QUOTES = [
+    "「駆逐完了。」",
+    "「俺は負けない。」",
+    "「明日は自分で掴み取る。」",
+    "「任務完了。」",
+    "「怒りは才能だ。」",
+    "「苦難は人を強くする。」"
+];
+
+let lastClearQuoteIndex = -1;
+
+/**
+ * 重複を避けつつランダムなクリアセリフを取得する
+ */
+function getRandomClearQuote() {
+    let index;
+    do {
+        index = Math.floor(Math.random() * CLEAR_QUOTES.length);
+    } while (index === lastClearQuoteIndex && CLEAR_QUOTES.length > 1);
+
+    lastClearQuoteIndex = index;
+    return CLEAR_QUOTES[index];
+}
+
 
 // ステージ個別設定（1始まりのインデックス）
 const STAGE_OVERRIDES = {
@@ -655,7 +679,7 @@ function clearStage() {
     // 伐採成功表示（2行）
     resultTitle.innerHTML = `伐採成功<br>${cleared}株目`;
     resultTitle.style.color = "var(--safe-color)";
-    messageEl.textContent = "「駆逐完了。」";
+    messageEl.textContent = getRandomClearQuote();
 
     actionBtn.textContent = "次の伐採へ";
 
